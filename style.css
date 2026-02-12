@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f2f2f2;
+}
+
+/* Entire seesaw container */
+.scene {
+  position: relative;
+  width: 600px;
+  height: 300px;
+}
+
+/* The triangular pivot */
+.pivot {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom: 60px solid #444;
+}
+
+/* The seesaw plank */
+.plank {
+  position: absolute;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
+  width: 400px; /* fixed length */
+  height: 15px;
+  background: #b5651d;
+  border-radius: 4px;
+
+  transform-origin: center center;
+  transition: transform 0.4s ease; /* smooth tilt later */
+  cursor: pointer;
+}
