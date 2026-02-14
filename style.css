@@ -5,6 +5,7 @@ body {
   justify-content: center;
   align-items: center;
   background: #f2f2f2;
+  overflow-x: hidden;
 }
 
 .info-panel {
@@ -22,6 +23,7 @@ body {
   display: flex;
   gap: 30px;
   align-items: center;
+  justify-content: center;
 }
 
 .info-item {
@@ -73,7 +75,7 @@ body {
 .legend {
   position: absolute;
   top: 20px;
-  left: 20px;
+  left: 100px;
   background: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -106,6 +108,7 @@ body {
   position: relative;
   width: 600px;
   height: 300px;
+  overflow: visible;
 }
 
 /* The triangular pivot */
@@ -176,9 +179,10 @@ body {
 /* Reset Button */
 .reset-container {
   position: absolute;
-  bottom: 30%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  margin-top: 180px;
   z-index: 100;
 }
 
@@ -204,4 +208,172 @@ body {
 
 .reset-button:active {
   transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .legend {
+    left: 20px;
+    top: 130px;
+  }
+  
+  .info-panel {
+    gap: 20px;
+    padding: 12px 20px;
+    flex-wrap: wrap;
+  }
+  
+  .info-item {
+    min-width: 65px;
+  }
+}
+
+@media (max-width: 768px) {
+  .scene {
+    width: 90vw;
+    max-width: 600px;
+    height: 250px;
+  }
+  
+  .legend {
+    left: 10px;
+    top: auto;
+    bottom: 20px;
+    padding: 10px 15px;
+    max-width: calc(100vw - 20px);
+  }
+  
+  .legend h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  #legend-weights {
+    gap: 6px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .info-panel {
+    gap: 10px;
+    padding: 10px 15px;
+    min-width: auto;
+    max-width: 90%;
+  }
+  
+  .info-item {
+    min-width: 50px;
+    gap: 5px;
+  }
+  
+  .info-label {
+    font-size: 11px;
+  }
+  
+  .info-value {
+    font-size: 16px;
+  }
+  
+  .info-value-container {
+    min-height: 40px;
+  }
+  
+  .reset-container {
+    margin-top: 150px;
+  }
+  
+  .reset-button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .scene {
+    width: 600px;
+    height: 220px;
+    transform: scale(0.9);
+    transform-origin: center top;
+  }
+  
+  .info-panel {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+    max-width: 95%;
+  }
+  
+  .info-item {
+    min-width: 45px;
+  }
+  
+  .legend {
+    transform: scale(0.9);
+    transform-origin: left bottom;
+  }
+  
+  .reset-container {
+    margin-top: 130px;
+  }
+  
+  .reset-button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scene {
+    width: 600px;
+    height: 200px;
+    transform: scale(0.8);
+    transform-origin: center top;
+  }
+  
+  .plank {
+    height: 12px;
+  }
+  
+  .info-panel {
+    top: 10px;
+    padding: 6px 10px;
+    gap: 6px;
+    max-width: 95%;
+  }
+  
+  .info-item {
+    min-width: 40px;
+  }
+  
+  .info-label {
+    font-size: 10px;
+  }
+  
+  .info-value {
+    font-size: 14px;
+  }
+  
+  .info-value-container {
+    min-height: 35px;
+  }
+  
+  .legend {
+    bottom: 10px;
+    left: 10px;
+    transform: scale(0.75);
+  }
+  
+  .reset-container {
+    margin-top: 110px;
+  }
+  
+  .reset-button {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .weight {
+    font-size: 10px;
+  }
 }
