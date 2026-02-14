@@ -17,12 +17,58 @@ function generateWeight() {
   return Math.floor(Math.random() * 10) + 1;
 }
 
+// Create weight legend
+function createLegend() {
+  const legendContainer = document.getElementById('legend-weights');
+  
+  for (let weight = 1; weight <= 10; weight++) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    
+    const circle = document.createElement('div');
+    const size = 20 + weight * 2;
+    const hue = (weight - 1) * 36;
+    
+    circle.style.width = size + 'px';
+    circle.style.height = size + 'px';
+    circle.style.borderRadius = '50%';
+    circle.style.background = `hsl(${hue}, 85%, 40%)`;
+    circle.style.display = 'flex';
+    circle.style.justifyContent = 'center';
+    circle.style.alignItems = 'center';
+    circle.style.color = 'white';
+    circle.style.fontWeight = 'bold';
+    circle.style.fontSize = (10 + weight) + 'px';
+    circle.textContent = weight;
+    
+    item.appendChild(circle);
+    legendContainer.appendChild(item);
+  }
+}
+
+// Initialize legend on page load
+createLegend();
+
 // New weight object
 function createWeightElement(weight, x) {
   const weightEl = document.createElement("div");
   weightEl.classList.add("weight");
   weightEl.textContent = weight;
-  weightEl.style.left = x + "px"; 
+  weightEl.style.left = x + "px";
+  
+  // Size proportional to weight (20px base + 4px per kg)
+  const size = 20 + weight * 2;
+  weightEl.style.width = size + "px";
+  weightEl.style.height = size + "px";  
+  
+  // Font size proportional to weight
+  const fontSize = 10 + weight;
+  weightEl.style.fontSize = fontSize + "px";
+  
+  // Color based on weight (rainbow gradient: red -> orange -> yellow -> green -> blue)
+  const hue = (weight - 1) * 36; // 0° to 324° (10 steps of 36°)
+  weightEl.style.background = `hsl(${hue}, 85%, 40%)`;
+  
   plank.appendChild(weightEl);
 }
 
