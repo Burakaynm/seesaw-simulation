@@ -52,6 +52,40 @@ function createLegend() {
 // Initialize legend on page load
 createLegend();
 
+// Update info panel
+function updateInfoPanel() {
+  // Update next weight circle
+  const circle = document.getElementById('next-weight-circle');
+  const size = 20 + nextWeight * 2;
+  const hue = (nextWeight - 1) * 36;
+  
+  circle.style.width = size + 'px';
+  circle.style.height = size + 'px';
+  circle.style.background = `hsl(${hue}, 85%, 40%)`;
+  circle.textContent = nextWeight;
+  circle.style.fontSize = (10 + nextWeight) + 'px';
+  
+  document.getElementById('current-angle').textContent = currentAngle + '°';
+  
+  // Calculate totals for left and right
+  let leftTotal = 0;
+  let rightTotal = 0;
+  
+  for (const obj of objects) {
+    if (obj.x < PIVOT_X) {
+      leftTotal += obj.weight;
+    } else if (obj.x > PIVOT_X) {
+      rightTotal += obj.weight;
+    }
+  }
+  
+  document.getElementById('left-total').textContent = leftTotal + ' kg';
+  document.getElementById('right-total').textContent = rightTotal + ' kg';
+}
+
+// Initial update
+updateInfoPanel();
+
 function getPlankPosition(event) {
   const rect = plank.getBoundingClientRect();
   
@@ -117,9 +151,9 @@ plank.addEventListener("mousemove", function(event) {
   const predictedAngle = calculateAngle(newLeftTorque, newRightTorque);
   const angleDiff = predictedAngle - currentAngle;
   
-  // Add tooltip showing predictions
+  // Add tooltip showing predictions (simplified)
   previewWeight.setAttribute('data-tooltip', 
-    `Uzaklık: ${distance.toFixed(0)}px\nTorque: ${torque.toFixed(0)}\n\nŞu anki açı: ${currentAngle}°\nYeni açı: ${predictedAngle}°\nDeğişim: ${angleDiff > 0 ? '+' : ''}${angleDiff}°`
+    `Torque: ${torque.toFixed(0)}\n\nNew angle: ${predictedAngle}°\nChange: ${angleDiff > 0 ? '+' : ''}${angleDiff}°`
   );
   
   // Apply counter-rotation to keep preview upright
@@ -147,9 +181,9 @@ function createWeightElement(weight, x) {
   const distance = Math.abs(x - PIVOT_X);
   const torque = weight * distance;
   
-  // Add tooltip with calculation info
+  // Add tooltip with calculation info (simplified)
   weightEl.setAttribute('data-tooltip', 
-    `Uzaklık: ${distance.toFixed(0)}px\nTorque: ${torque.toFixed(0)}`
+    `Torque: ${torque.toFixed(0)}`
   );
   
   // Size proportional to weight (20px base + 4px per kg)
@@ -236,4 +270,7 @@ plank.addEventListener("click", function(event) {
 
   // Generate the next random weight for the next click
   nextWeight = generateWeight();
+  
+  // Update info panel
+  updateInfoPanel();
 });
