@@ -2,6 +2,7 @@ const PLANK_LENGTH = 400;             // plank length
 const PIVOT_X = PLANK_LENGTH / 2;     // pivot position (center of the plank)
 const MAX_ANGLE = 30;                 // maximum tilt
 const TORQUE_DIVISOR = 10;            // tilt sensitivity
+const STORAGE_KEY = 'seesaw-state';   // localStorage key
 
 // Each object has: { x: position on the plank, weight: 1–10 }
 const objects = [];
@@ -18,6 +19,75 @@ let previewWeight = null;
 // Random weight between 1 and 10
 function generateWeight() {
   return Math.floor(Math.random() * 10) + 1;
+}
+
+// Save current state to localStorage
+function saveState() {
+  const state = {
+    objects: objects,
+    nextWeight: nextWeight,
+    currentAngle: currentAngle
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// Load state from localStorage
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const state = JSON.parse(saved);
+      
+      // Restore objects array
+      objects.length = 0; // Clear existing
+      objects.push(...state.objects);
+      
+      // Restore next weight
+      nextWeight = state.nextWeight;
+      
+      // Restore angle
+      currentAngle = state.currentAngle;
+      
+      // Recreate visual elements for all objects
+      objects.forEach(obj => {
+        createWeightElement(obj.weight, obj.x);
+      });
+      
+      // Apply the saved tilt
+      applyTilt(currentAngle);
+      
+      return true;
+    } catch (e) {
+      console.error('Failed to load state:', e);
+      return false;
+    }
+  }
+  return false;
+}
+
+// Clear saved state and reset simulation
+function resetSimulation() {
+  // Clear localStorage
+  localStorage.removeItem(STORAGE_KEY);
+  
+  // Clear objects array
+  objects.length = 0;
+  
+  // Reset angle
+  currentAngle = 0;
+  
+  // Generate new weight
+  nextWeight = generateWeight();
+  
+  // Remove all weight elements from DOM
+  const weights = plank.querySelectorAll('.weight');
+  weights.forEach(w => w.remove());
+  
+  // Reset plank tilt
+  applyTilt(0);
+  
+  // Update info panel
+  updateInfoPanel();
 }
 
 // Create weight legend
@@ -52,6 +122,9 @@ function createLegend() {
 // Initialize legend on page load
 createLegend();
 
+// Load saved state on page load
+const stateLoaded = loadState();
+
 // Update info panel
 function updateInfoPanel() {
   // Update next weight circle
@@ -83,8 +156,13 @@ function updateInfoPanel() {
   document.getElementById('right-total').textContent = rightTotal + ' kg';
 }
 
-// Initial update
-updateInfoPanel();
+// Initial update (only if no state was loaded)
+if (!stateLoaded) {
+  updateInfoPanel();
+} else {
+  // Update info panel with loaded state
+  updateInfoPanel();
+}
 
 function getPlankPosition(event) {
   const rect = plank.getBoundingClientRect();
@@ -273,4 +351,11 @@ plank.addEventListener("click", function(event) {
   
   // Update info panel
   updateInfoPanel();
+  
+  // Save state to localStorage
+  saveState();
+});
+// Reset button event listener
+document.getElementById('reset-btn').addEventListener('click', function() {
+  resetSimulation();
 });
