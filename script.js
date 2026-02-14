@@ -97,6 +97,31 @@ plank.addEventListener("mousemove", function(event) {
   const hue = (weight - 1) * 36;
   previewWeight.style.background = `hsl(${hue}, 85%, 40%)`;
   
+  // Calculate what would happen if this weight was added
+  const distance = Math.abs(x - PIVOT_X);
+  const torque = weight * distance;
+  
+  // Get current torques
+  const { leftTorque, rightTorque } = calculateTotals();
+  
+  // Calculate new torques with preview weight
+  let newLeftTorque = leftTorque;
+  let newRightTorque = rightTorque;
+  if (x < PIVOT_X) {
+    newLeftTorque += torque;
+  } else if (x > PIVOT_X) {
+    newRightTorque += torque;
+  }
+  
+  // Calculate predicted angle
+  const predictedAngle = calculateAngle(newLeftTorque, newRightTorque);
+  const angleDiff = predictedAngle - currentAngle;
+  
+  // Add tooltip showing predictions
+  previewWeight.setAttribute('data-tooltip', 
+    `Uzaklık: ${distance.toFixed(0)}px\nTorque: ${torque.toFixed(0)}\n\nŞu anki açı: ${currentAngle}°\nYeni açı: ${predictedAngle}°\nDeğişim: ${angleDiff > 0 ? '+' : ''}${angleDiff}°`
+  );
+  
   // Apply counter-rotation to keep preview upright
   previewWeight.style.transform = `translateX(-50%) rotate(${-currentAngle}deg)`;
   
@@ -117,6 +142,15 @@ function createWeightElement(weight, x) {
   weightEl.classList.add("weight");
   weightEl.textContent = weight;
   weightEl.style.left = x + "px";
+  
+  // Calculate distance from pivot and torque
+  const distance = Math.abs(x - PIVOT_X);
+  const torque = weight * distance;
+  
+  // Add tooltip with calculation info
+  weightEl.setAttribute('data-tooltip', 
+    `Uzaklık: ${distance.toFixed(0)}px\nTorque: ${torque.toFixed(0)}`
+  );
   
   // Size proportional to weight (20px base + 4px per kg)
   const size = 20 + weight * 2;

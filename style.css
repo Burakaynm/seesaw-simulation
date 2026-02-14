@@ -84,6 +84,26 @@ body {
   color: white;
   font-weight: bold;
   transform: translateX(-50%);
+  cursor: help;
+}
+
+.weight.preview::after {  
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: pre-line;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1000;
+  min-width: 100px;
+  line-height: 1.4;
 }
 
 .weight.preview {
