@@ -12,6 +12,9 @@ let nextWeight = generateWeight();
 // Current angle of the plank
 let currentAngle = 0;
 
+// Preview weight element
+let previewWeight = null;
+
 // Random weight between 1 and 10
 function generateWeight() {
   return Math.floor(Math.random() * 10) + 1;
@@ -49,6 +52,65 @@ function createLegend() {
 // Initialize legend on page load
 createLegend();
 
+function getPlankPosition(event) {
+  const rect = plank.getBoundingClientRect();
+  
+  // Plank center position in screen coordinates
+  const plankCenterX = rect.left + rect.width / 2;
+  const plankCenterY = rect.top + rect.height / 2;
+  
+  // Mouse position relative to plank center
+  const relativeX = event.clientX - plankCenterX;
+  const relativeY = event.clientY - plankCenterY;
+  
+  // Apply inverse rotation to get the actual position on the unrotated plank
+  const angleRad = (-currentAngle * Math.PI) / 180;
+  const cosAngle = Math.cos(angleRad);
+  const sinAngle = Math.sin(angleRad);
+  
+  const unrotatedX = relativeX * cosAngle - relativeY * sinAngle;
+  return Math.max(0, Math.min(PLANK_LENGTH, unrotatedX + PIVOT_X));
+}
+
+plank.addEventListener("mousemove", function(event) {
+  const x = getPlankPosition(event);
+  
+  // Remove old preview if exists
+  if (previewWeight) {
+    previewWeight.remove();
+  }
+  
+  // Create new preview weight
+  const weight = nextWeight;
+  previewWeight = document.createElement("div");
+  previewWeight.classList.add("weight", "preview");
+  previewWeight.textContent = weight;
+  previewWeight.style.left = x + "px";
+  
+  const size = 20 + weight * 2;
+  previewWeight.style.width = size + "px";
+  previewWeight.style.height = size + "px";
+  
+  const fontSize = 10 + weight;
+  previewWeight.style.fontSize = fontSize + "px";
+  
+  const hue = (weight - 1) * 36;
+  previewWeight.style.background = `hsl(${hue}, 85%, 40%)`;
+  
+  // Apply counter-rotation to keep preview upright
+  previewWeight.style.transform = `translateX(-50%) rotate(${-currentAngle}deg)`;
+  
+  plank.appendChild(previewWeight);
+});
+
+plank.addEventListener("mouseleave", function() {
+  // Remove preview when mouse leaves the plank
+  if (previewWeight) {
+    previewWeight.remove();
+    previewWeight = null;
+  }
+});
+
 // New weight object
 function createWeightElement(weight, x) {
   const weightEl = document.createElement("div");
@@ -76,8 +138,6 @@ function createWeightElement(weight, x) {
 function calculateTotals() {
   let leftTorque = 0;
   let rightTorque = 0;
-  let leftSum = 0;
-  let rightSum = 0;
 
   // Loop through all objects and calculate their torque contribution
   for (const obj of objects) {
@@ -85,15 +145,13 @@ function calculateTotals() {
 
     // If the object is on the left side of the pivot (x < pivot)
     if (obj.x < PIVOT_X) {
-      leftSum += obj.weight;                  // Add to the left sum
       leftTorque += obj.weight * distance;    // Add to the left torque
     } else {
-      rightSum += obj.weight;                 // Add to the right sum
       rightTorque += obj.weight * distance;   // Add to the right torque
     }
   }
 
-  return { leftSum, rightSum, leftTorque, rightTorque };
+  return { leftTorque, rightTorque };
 }
 
 // The formula is (capped at 30): angle = (rightTorque - leftTorque) / TORQUE_DIVISOR
@@ -118,28 +176,14 @@ function applyTilt(angleDeg) {
 
 
 plank.addEventListener("click", function(event) {
-  const rect = plank.getBoundingClientRect();
+  // Remove preview on click
+  if (previewWeight) {
+    previewWeight.remove();
+    previewWeight = null;
+  }
   
-  // Plank center position in screen coordinates
-  const plankCenterX = rect.left + rect.width / 2;
-  const plankCenterY = rect.top + rect.height / 2;
-  
-  // Click position relative to plank center
-  const relativeX = event.clientX - plankCenterX;
-  const relativeY = event.clientY - plankCenterY;
-  
-  // Apply inverse rotation to get the actual position on the unrotated plank
-  const angleRad = (-currentAngle * Math.PI) / 180;
-  const cosAngle = Math.cos(angleRad);
-  const sinAngle = Math.sin(angleRad);
-  
-  // Reverse rotate the click position to get the unrotated coordinates
-  const unrotatedX = relativeX * cosAngle - relativeY * sinAngle;
-  
-  // Convert back to plank coordinates (0 to PLANK_LENGTH)
-  const x = Math.max(0, Math.min(PLANK_LENGTH, unrotatedX + PIVOT_X));
-
-  const weight = generateWeight();
+  const x = getPlankPosition(event);
+  const weight = nextWeight;
 
   // Store the new object (position and weight)
   objects.push({ x: x, weight: weight });
@@ -148,7 +192,7 @@ plank.addEventListener("click", function(event) {
   createWeightElement(weight, x);
 
   // Recalculate the total torques and weights
-  const { leftSum, rightSum, leftTorque, rightTorque } = calculateTotals();
+  const { leftTorque, rightTorque } = calculateTotals();
 
   // Calculate the tilt angle based on torques
   const angle = calculateAngle(leftTorque, rightTorque);

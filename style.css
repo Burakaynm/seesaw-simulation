@@ -63,21 +63,20 @@ body {
   position: absolute;
   bottom: 110px;
   left: 50%;
-  transform: translateX(-50%) rotate(0deg);
-  width: 400px; /* fixed length */
+  transform: translateX(-50%);
+  width: 400px;
   height: 15px;
   background: #b5651d;
   border-radius: 4px;
 
   transform-origin: center center;
-  transition: transform 0.4s ease; /* smooth tilt later */
+  transition: transform 0.4s ease;
   cursor: pointer;
 }
 
 .weight {
   position: absolute;
   bottom: 15px;
-  background: crimson;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -85,4 +84,9 @@ body {
   color: white;
   font-weight: bold;
   transform: translateX(-50%);
+}
+
+.weight.preview {
+  opacity: 0.4;
+  pointer-events: none;
 }
